@@ -70,7 +70,7 @@ jobs:
           IMAGE_TAG: ${{ steps.repo-name.outputs.repository-name }}
         run: docker build -t ${{ env.IMAGE_TAG }} -f ${{ inputs.dockerfile }} .
 
-      - name: 'Login to GCR'
+      - name: 'Login to Artifact Registry'
         uses: docker/login-action@v3
         with:
           registry: ${{ inputs.gcp_container_registry }}

@@ -11,7 +11,7 @@ fastify.register(routes)
 
 const start = async () => {
   try {
-    await fastify.listen({ port: 8888 })
+    await fastify.listen({ port: process.env.SERVER_PORT || 8080 })
   } catch (err) {
     fastify.log.error(err)
     process.exit(1)

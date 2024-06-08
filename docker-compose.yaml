@@ -10,7 +10,7 @@ services:
     image: api
     restart: no
     ports:
-      - 8888:8888
+      - 8080:8080
     depends_on:
       postgres:
         condition: service_started
