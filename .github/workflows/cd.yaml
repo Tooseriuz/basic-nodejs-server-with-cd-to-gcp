@@ -57,4 +57,4 @@ jobs:
       secrets: ${{ needs.secrets.outputs.secrets }}
     secrets:
       workload-indentity-provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER_NAME }}
-      service-account: ${{ secrets.GCP_SERVICE_ACCOUNT_NAME }}
+      service-account: ${{ secrets.CICD_SERVICE_ACCOUNT }}
