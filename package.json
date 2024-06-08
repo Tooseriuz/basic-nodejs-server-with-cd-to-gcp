@@ -1,0 +1,34 @@
+{
+  "name": "basic-nodejs-server-with-cd-to-gcp",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js",
+    "start:docker": "docker compose up --build -d app",
+    "migrate": "node ./db/migration/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tooseriuz/basic-nodejs-server-with-cd-to-gcp.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Tooseriuz/basic-nodejs-server-with-cd-to-gcp/issues"
+  },
+  "homepage": "https://github.com/Tooseriuz/basic-nodejs-server-with-cd-to-gcp#readme",
+  "dependencies": {
+    "@fastify/postgres": "^5.2.2",
+    "drizzle-orm": "^0.31.2",
+    "fastify": "^4.27.0",
+    "fastify-plugin": "^4.5.1",
+    "nodemon": "^3.1.3",
+    "pg": "^8.12.0"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.22.6"
+  }
+}

@@ -1,0 +1,59 @@
+name: 'CD'
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+jobs:
+  vars:
+    name: 'Create vars'
+    uses: ./.github/workflows/vars-to-gcp-format.yaml
+    with:
+      includes: ${{ vars.INCLUDE_VARS }}
+
+  secrets:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    name: 'Create secrets'
+    uses: ./.github/workflows/create-secrets-to-gcp.yaml
+    with:
+      includes: ${{ vars.INCLUDE_SECRETS }}
+      gcp_project_id: 'playground-api-425813'
+      resource_name: 'api'
+    secrets: inherit
+
+  migrate:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    name: 'Database Migration'
+    needs: [secrets]
+    uses: ./cicd/.github/workflows/database-migrate.yaml
+    with:
+      command: 'yarn migrate'
+    secrets:
+      db_username: ${{ secrets.CICD_DATABASE_USER }}
+      db_name: ${{ secrets.DATABASE_NAME }}
+      sql_instance_name: ${{ secrets.GCP_CLOUD_SQL_CONNECTION_NAME }}
+      workload-indentity-provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER_NAME }}
+      service-account: ${{ secrets.CICD_SERVICE_ACCOUNT }}
+
+  build:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    name: 'Build & Push & Deploy'
+    needs: [vars, secrets, migrate]
+    uses: ./cicd/.github/workflows/gcp-build-to-gcr-deploy-to-cloud-run.yaml
+    with:
+      dockerfile: ./Dockerfile
+      gcp_project_id: 'playground-api-425813'
+      gcp_container_registry: 'europe-west1-docker.pkg.dev'
+      region_id: 'europe-west1'
+      vars: ${{ needs.vars.outputs.vars }}
+      secrets: ${{ needs.secrets.outputs.secrets }}
+    secrets:
+      workload-indentity-provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER_NAME }}
+      service-account: ${{ secrets.GCP_SERVICE_ACCOUNT_NAME }}

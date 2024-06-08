@@ -1,0 +1,38 @@
+name: 'Create Vars as GCP format'
+on:
+  workflow_call:
+    inputs:
+      includes:
+        description: List (comma-separated) of GitHub vars names to include in the Cloud run
+        type: string
+        required: false
+    outputs:
+      vars:
+        description: Github vars in GCP format
+        value: ${{ jobs.create.outputs.vars }}
+jobs:
+  create:
+    runs-on: ubuntu-latest
+    outputs:
+      vars: ${{ steps.vars.outputs.vars}}
+    steps:
+      - name: 'Extract vars and create to GCP format'
+        id: vars
+        env:
+          VARS_JSON: ${{ toJson(vars) }}
+        run: |
+          keys=${{ inputs.includes }}
+          result=''
+          if [ ${#keys[@]} ]; then
+            for key in ${keys//,/ }
+            do
+                value=$(echo "$VARS_JSON" | jq -r ".$key")
+                if [[ "$value" == "null" ]]; then
+                    echo "$key not found in GitHub vars. Abort!"
+                    exit 1
+                fi
+                echo "Found: $key"
+                result+="$key=$value,"
+            done
+          fi
+          echo "vars=$result" >> "$GITHUB_OUTPUT"

@@ -1,0 +1,74 @@
+name: 'Database migration'
+on:
+  workflow_call:
+    inputs:
+      command:
+        description: Command to run db migrate
+        type: string
+        required: true
+    secrets:
+      workload-indentity-provider:
+        required: true
+      service-account:
+        required: true
+      sql_instance_name:
+        description: Cloud SQL instance name
+        required: true
+      db_username:
+        description: Cloud SQL username
+        required: true
+      db_password:
+        description: Cloud SQL user password
+        required: true
+      db_name:
+        description: Cloud SQL database name
+        required: true
+    
+jobs:
+  migrate:
+    runs-on: ubuntu-20.04
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    env:
+      DATABASE_USER: ${{ secrets.db_username }}
+      DATABASE_PASSWORD: ${{ secrets.db_password }}
+      DATABASE_NAME: ${{ secrets.db_name }}
+    steps:
+      # v4.1.2 Match 2024 https://github.com/actions/checkout/tags
+      - name: 'Git checkout'
+        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633
+
+      - name: 'GCP auth'
+        id: auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          token_format: access_token
+          workload_identity_provider: ${{ secrets.workload-indentity-provider }}
+          service_account: ${{ secrets.service-account }}
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+      
+      # v4 (4.0.0) @ Oct 2023 https://github.com/actions/setup-node/tags
+      - name: 'Install Node'
+        uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65
+        with:
+          node-version: '20.9.0'
+          cache: 'yarn'
+      
+      - name: 'Install dependencies'
+        run: yarn
+
+      - name: 'Run Cloud SQL proxy'
+        run: |
+          docker run -d --net host --name cloudsql-proxy --restart on-failure --expose 5432 gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.10.1 --run-connection-test -t ${{steps.auth.outputs.access_token}} ${{ secrets.sql_instance_name }}  
+      
+      - name: 'Run migration'
+        run: |
+          ${{ inputs.command }}
+
+      - name: 'Print logs'
+        if: ${{ failure() }}
+        run: docker logs cloudsql-proxy
+
