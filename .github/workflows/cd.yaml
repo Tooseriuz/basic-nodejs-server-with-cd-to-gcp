@@ -30,7 +30,7 @@ jobs:
       id-token: 'write'
     name: 'Database Migration'
     needs: [secrets]
-    uses: ./cicd/.github/workflows/database-migrate.yaml
+    uses: ./.github/workflows/database-migrate.yaml
     with:
       command: 'yarn migrate'
     secrets:
@@ -46,7 +46,7 @@ jobs:
       id-token: 'write'
     name: 'Build & Push & Deploy'
     needs: [vars, secrets, migrate]
-    uses: ./cicd/.github/workflows/gcp-build-to-gcr-deploy-to-cloud-run.yaml
+    uses: ./.github/workflows/gcp-build-to-gcr-deploy-to-cloud-run.yaml
     with:
       dockerfile: ./Dockerfile
       gcp_project_id: 'playground-api-425813'
