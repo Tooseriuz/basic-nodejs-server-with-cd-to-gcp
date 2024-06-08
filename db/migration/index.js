@@ -17,4 +17,6 @@ async function migrateFunc() {
   await migrate(db, { migrationsFolder: './db/migration/script' });
   await client.end();
 }
+
+await new Promise(resolve => setTimeout(resolve, 5000));
 migrateFunc()
