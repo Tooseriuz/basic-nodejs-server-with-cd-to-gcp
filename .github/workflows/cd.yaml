@@ -36,6 +36,7 @@ jobs:
     secrets:
       db_username: ${{ secrets.CICD_DATABASE_USER }}
       db_name: ${{ secrets.DATABASE_NAME }}
+      db_password: ${{ secrets.DATABASE_PASSWORD }}
       sql_instance_name: ${{ secrets.GCP_CLOUD_SQL_CONNECTION_NAME }}
       workload-indentity-provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER_NAME }}
       service-account: ${{ secrets.CICD_SERVICE_ACCOUNT }}
