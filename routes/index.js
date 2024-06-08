@@ -14,6 +14,11 @@ async function routes (fastify, options) {
     await fastify.drizzle.insert(model.users).values(newUser)
     return fastify.drizzle.select().from(model.users).where(eq(model.users.fullName, newUser.fullName))
   })
+
+  fastify.get('/test-env/:env', async (request, reply) => {
+    const { env } = request.params
+    return process.env[env] || `env '${env}' not found`
+  })
 }
 
 export default routes;
