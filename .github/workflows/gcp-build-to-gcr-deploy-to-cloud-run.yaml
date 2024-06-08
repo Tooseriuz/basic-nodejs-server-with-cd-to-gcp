@@ -80,7 +80,7 @@ jobs:
       - name: 'Push Docker Image to Artifact Registry'
         env:
           IMAGE_TAG: ${{ steps.repo-name.outputs.repository-name }}
-          IMAGE_PATH: "${{ env.IMAGE_DIR }}/${{ steps.repo-name.outputs.repository-name }}"
+          IMAGE_PATH: "${{ env.IMAGE_DIR }}/api/${{ steps.repo-name.outputs.repository-name }}"
         run:  |-
           docker tag ${{ env.IMAGE_TAG }} ${{ env.IMAGE_PATH }}:latest
           docker push ${{ env.IMAGE_PATH }} --all-tags
@@ -89,7 +89,7 @@ jobs:
         id: deploy
         uses: google-github-actions/deploy-cloudrun@v2.2.0
         env:
-          IMAGE_PATH: "${{ env.IMAGE_DIR }}/${{ steps.repo-name.outputs.repository-name }}"
+          IMAGE_PATH: "${{ env.IMAGE_DIR }}/api/${{ steps.repo-name.outputs.repository-name }}"
         with:
           service: '${{ steps.repo-name.outputs.repository-name }}'
           region: ${{ inputs.region_id }}
