@@ -34,7 +34,7 @@ jobs:
     with:
       command: 'yarn migrate'
     secrets:
-      db_username: ${{ secrets.CICD_DATABASE_USER }}
+      db_username: ${{ secrets.DATABASE_USER }}
       db_name: ${{ secrets.DATABASE_NAME }}
       db_password: ${{ secrets.DATABASE_PASSWORD }}
       sql_instance_name: ${{ secrets.GCP_CLOUD_SQL_CONNECTION_NAME }}
