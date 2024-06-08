@@ -9,12 +9,9 @@ const fastify = Fastify({
 fastify.register(db)
 fastify.register(routes)
 
-const start = async () => {
-  try {
-    await fastify.listen({ port: process.env.PORT || 8080 })
-  } catch (err) {
+fastify.listen({ port: process.env.PORT || 8080, host: '0.0.0.0' }, function (err, address) {
+  if (err) {
     fastify.log.error(err)
     process.exit(1)
   }
-}
-await start()
+})
